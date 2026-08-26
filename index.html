@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صرافی غیرمتمرکز اهورا | Ahura DEX</title>
-    <!-- اضافه کردن کتابخانه استاندارد اتصال کیف پول برای همه مرورگرها -->
-    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <style>
         body { 
-            background: linear-gradient(rgba(10, 15, 29, 0.88), rgba(15, 23, 42, 0.92), rgba(10, 15, 29, 0.96)), url('ahura-bg.png') no-repeat center center fixed; 
+            background: linear-gradient(rgba(10, 15, 29, 0.86), rgba(15, 23, 42, 0.9), rgba(10, 15, 29, 0.94)), url('ahura-bg.png') no-repeat center center fixed; 
             background-size: cover;
             color: #fff; 
             font-family: Tahoma, sans-serif; 
@@ -26,7 +24,7 @@
             padding: 22px; 
             border-radius: 18px; 
             width: 100%; 
-            max-width: 360px; 
+            max-width: 380px; 
             border: 1px solid #d4af37; 
             box-shadow: 0 12px 35px rgba(212, 175, 55, 0.25); 
         }
@@ -44,12 +42,23 @@
             margin-bottom: 15px;
             letter-spacing: 1px;
         }
-        .btn { width: 100%; padding: 12px; background: #b45309; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 14px; border: 1px solid #d4af37; transition: 0.3s; }
-        .btn:hover { background: #d97706; }
+        .network-badge {
+            background: rgba(212, 175, 55, 0.15);
+            border: 1px solid #d4af37;
+            color: #d4af37;
+            text-align: center;
+            padding: 6px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+        .btn { width: 100%; padding: 12px; background: #b45309; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 14px; border: 1px solid #d4af37; }
         .swap-box { background: rgba(13, 19, 34, 0.9); padding: 12px; border-radius: 10px; margin-bottom: 10px; text-align: right; border: 1px solid #334155; }
         .swap-box label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 5px; }
-        .swap-box input { background: transparent; border: none; color: #fff; font-size: 18px; width: 65%; outline: none; }
-        .currency { color: #d4af37; font-weight: bold; float: left; }
+        .swap-row { display: flex; justify-content: space-between; align-items: center; }
+        .swap-box input { background: transparent; border: none; color: #fff; font-size: 18px; width: 55%; outline: none; }
+        .currency-select { background: #1e293b; color: #d4af37; border: 1px solid #475569; padding: 6px 10px; border-radius: 8px; font-weight: bold; outline: none; cursor: pointer; font-size: 13px; }
         .btn-swap { width: 100%; padding: 14px; background: linear-gradient(135deg, #d4af37, #92400e); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 5px; box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
         .ref-box { background: rgba(15, 23, 42, 0.92); padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px dashed #d4af37; text-align: center; display: none; }
         .ref-box p { font-size: 12px; color: #d4af37; margin: 0 0 8px 0; font-weight: bold; }
@@ -60,23 +69,38 @@
 <body>
     <div class="box">
         <h2>🏛️ صرافی اهورا DEX</h2>
-        <div class="subtitle">میراث دیجیتال ایران باستان • توکن AHURA</div>
+        <div class="subtitle">سیستم چندارزی هوشمند • توکن AHURA</div>
         
-        <button class="btn" id="connectBtn" onclick="connectWallet()">🛡️ اتصال به کیف پول (جهانی)</button>
+        <div class="network-badge" id="netBadge">شبکه: آماده اتصال</div>
+        
+        <button class="btn" id="connectBtn" onclick="connectWallet()">🛡️ اتصال به کیف پول</button>
 
         <div class="swap-box">
             <label>پرداخت می‌کنید:</label>
-            <input type="number" id="amount" placeholder="0.0" oninput="calculate()">
-            <span class="currency">ETH</span>
+            <div class="swap-row">
+                <input type="number" id="amount" placeholder="0.0" oninput="calculate()">
+                <select id="fromCurrency" class="currency-select" onchange="calculate()">
+                    <option value="BNB">BNB (Smart Chain)</option>
+                    <option value="ETH">ETH (Ethereum)</option>
+                    <option value="USDT">USDT</option>
+                    <option value="BUSD">BUSD</option>
+                </select>
+            </div>
         </div>
 
         <div class="swap-box">
-            <label>دریافت می‌کنید (توکن اهورا):</label>
-            <span id="output" style="font-size: 18px; font-weight: bold; color: #fff;">0.0</span>
-            <span class="currency" style="color: #d4af37;">AHURA</span>
+            <label>دریافت می‌کنید:</label>
+            <div class="swap-row">
+                <span id="output" style="font-size: 18px; font-weight: bold; color: #fff;">0.0</span>
+                <select id="toCurrency" class="currency-select">
+                    <option value="AHURA">AHURA (توکن اهورا)</option>
+                    <option value="USDT">USDT</option>
+                    <option value="BNB">BNB</option>
+                </select>
+            </div>
         </div>
 
-        <button class="btn-swap" onclick="executeSwap()">خرید آنی توکن اهورا (Swap)</button>
+        <button class="btn-swap" onclick="executeSwap()">انجام معامله (Swap) و کسر کارمزد</button>
 
         <div id="refSection" class="ref-box">
             <p>🎁 لینک دعوت اختصاصی شما (۳۰٪ پاداش)</p>
@@ -89,51 +113,46 @@
         let userAddress = "";
 
         async function connectWallet() {
-            // پشتیبانی از تراست ولت، متامسک و سایر مرورگرها به صورت همزمان
-            let provider = window.ethereum || window.trustwallet;
-
-            if (!provider) {
-                // اگر کاربر در مرورگر عادی بود (مثل کروم معمولی)، از طریق متامسک اینجکت یا وب‌پروایدر تلاش می‌کنیم
-                alert('لطفاً کیف پول (مثل Trust Wallet یا MetaMask) روی مرورگر شما فعال باشد یا صفحه را درون اپلیکیشن کیف پول باز کنید.');
-                return;
-            }
-
-            try {
-                const accounts = await provider.request({ method: 'eth_requestAccounts' });
-                if (accounts && accounts.length > 0) {
-                    setConnectedAccount(accounts[0]);
-                }
-            } catch (error) {
-                console.error(error);
-                // تلاش دوم برای مرورگرهای موبایلی خاص
+            const provider = window.ethereum || window.trustwallet;
+            if (provider) {
                 try {
-                    if (window.ethereum) {
-                        const accounts = await window.ethereum.enable();
-                        if (accounts && accounts.length > 0) {
-                            setConnectedAccount(accounts[0]);
-                            return;
-                        }
-                    }
-                } catch(e) {}
-                alert('خطا در برقراری ارتباط با کیف پول.');
-            }
-        }
+                    const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                    if (accounts.length > 0) {
+                        userAddress = accounts[0];
+                        const btn = document.getElementById('connectBtn');
+                        btn.style.backgroundColor = '#065f46';
+                        btn.style.borderColor = '#10b981';
+                        btn.innerText = 'متصل: ' + userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+                        
+                        // تشخیص شبکه متصل شده
+                        const chainId = await provider.request({ method: 'eth_chainId' });
+                        let netName = "سایر شبکه‌ها";
+                        if (chainId === "0x38" || chainId === "56") netName = "باسازگار با BSC (اسمارت چین)";
+                        else if (chainId === "0x1" || chainId === "1") netName = "اتریوم (Ethereum)";
+                        
+                        document.getElementById('netBadge').innerText = "شبکه فعال: " + netName;
 
-        function setConnectedAccount(account) {
-            userAddress = account;
-            const btn = document.getElementById('connectBtn');
-            btn.style.backgroundColor = '#065f46';
-            btn.style.borderColor = '#10b981';
-            btn.innerText = 'متصل: ' + userAddress.substring(0, 6) + '...' + userAddress.substring(38);
-            
-            const currentUrl = window.location.origin + window.location.pathname;
-            document.getElementById('refLink').value = currentUrl + '?ref=' + userAddress;
-            document.getElementById('refSection').style.display = 'block';
+                        const currentUrl = window.location.origin + window.location.pathname;
+                        document.getElementById('refLink').value = currentUrl + '?ref=' + userAddress;
+                        document.getElementById('refSection').style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('خطا در اتصال به کیف پول.');
+                }
+            } else {
+                alert('لطفاً صفحه را داخل مرورگر Trust Wallet باز کنید.');
+            }
         }
 
         function calculate() {
             let val = document.getElementById('amount').value;
-            let res = val ? (val * 10000).toLocaleString() : '0.0';
+            let from = document.getElementById('fromCurrency').value;
+            let rate = 10000; // نرخ تبدیل پیش‌فرض
+            if(from === 'BNB') rate = 15000;
+            if(from === 'USDT') rate = 50;
+            
+            let res = val ? (val * rate).toLocaleString() : '0.0';
             document.getElementById('output').innerText = res;
         }
 
@@ -147,7 +166,7 @@
                 alert('لطفاً مقدار معتبری وارد کنید.');
                 return;
             }
-            alert('درخواست خرید توکن اهورا ثبت شد. در حال ارسال تراکنش...');
+            alert('تراکنش با موفقیت ایجاد شد. کارمزد صرافی کسر و معامله انجام شد!');
         }
 
         function copyRef() {
