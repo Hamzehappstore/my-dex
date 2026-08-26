@@ -51,32 +51,32 @@
         let userAddress = "";
 
         async function connectWallet() {
-            if (window.ethereum) {
+            const provider = window.ethereum || window.trustwallet;
+            if (provider) {
                 try {
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const accounts = await provider.request({ method: 'eth_requestAccounts' });
                     if (accounts.length > 0) {
                         userAddress = accounts[0];
                         const btn = document.getElementById('connectBtn');
                         btn.style.backgroundColor = '#10b981';
                         btn.innerText = 'متصل: ' + userAddress.substring(0, 6) + '...' + userAddress.substring(38);
                         
-                        // نمایش بخش رفرال
                         const currentUrl = window.location.origin + window.location.pathname;
                         document.getElementById('refLink').value = currentUrl + '?ref=' + userAddress;
                         document.getElementById('refSection').style.display = 'block';
                     }
                 } catch (error) {
                     console.error(error);
+                    alert('خطا در اتصال به کیف پول.');
                 }
             } else {
-                alert('لطفاً در مرورگر تراست ولت باز کنید.');
+                alert('لطفاً حتماً این صفحه را داخل مرورگر خودِ Trust Wallet باز کنید.');
             }
         }
 
         function calculate() {
             let val = document.getElementById('amount').value;
             let res = val ? (val * 3000).toFixed(2) : '0.0';
-            document.getElementById('outputinnerText' = res); // Fix syntax safely
             document.getElementById('output').innerText = res;
         }
 
