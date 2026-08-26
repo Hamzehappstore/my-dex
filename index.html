@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صرافی غیرمتمرکز اهورا | Ahura DEX</title>
+    <!-- اضافه کردن کتابخانه استاندارد اتصال کیف پول برای همه مرورگرها -->
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
     <style>
         body { 
-            background: linear-gradient(rgba(10, 15, 29, 0.85), rgba(15, 23, 42, 0.9), rgba(10, 15, 29, 0.95)), url('ahura-bg.png') no-repeat center center fixed; 
+            background: linear-gradient(rgba(10, 15, 29, 0.88), rgba(15, 23, 42, 0.92), rgba(10, 15, 29, 0.96)), url('ahura-bg.png') no-repeat center center fixed; 
             background-size: cover;
             color: #fff; 
             font-family: Tahoma, sans-serif; 
@@ -19,21 +21,21 @@
             box-sizing: border-box; 
         }
         .box { 
-            background: rgba(22, 31, 51, 0.9); 
-            backdrop-filter: blur(10px);
+            background: rgba(22, 31, 51, 0.92); 
+            backdrop-filter: blur(12px);
             padding: 22px; 
             border-radius: 18px; 
             width: 100%; 
             max-width: 360px; 
             border: 1px solid #d4af37; 
-            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2); 
+            box-shadow: 0 12px 35px rgba(212, 175, 55, 0.25); 
         }
         h2 { 
             color: #d4af37; 
             text-align: center; 
             margin-bottom: 5px; 
             font-size: 22px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }
         .subtitle {
             text-align: center;
@@ -42,13 +44,14 @@
             margin-bottom: 15px;
             letter-spacing: 1px;
         }
-        .btn { width: 100%; padding: 12px; background: #b45309; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 14px; border: 1px solid #d4af37; }
-        .swap-box { background: rgba(13, 19, 34, 0.85); padding: 12px; border-radius: 10px; margin-bottom: 10px; text-align: right; border: 1px solid #334155; }
+        .btn { width: 100%; padding: 12px; background: #b45309; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 14px; border: 1px solid #d4af37; transition: 0.3s; }
+        .btn:hover { background: #d97706; }
+        .swap-box { background: rgba(13, 19, 34, 0.9); padding: 12px; border-radius: 10px; margin-bottom: 10px; text-align: right; border: 1px solid #334155; }
         .swap-box label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 5px; }
         .swap-box input { background: transparent; border: none; color: #fff; font-size: 18px; width: 65%; outline: none; }
         .currency { color: #d4af37; font-weight: bold; float: left; }
         .btn-swap { width: 100%; padding: 14px; background: linear-gradient(135deg, #d4af37, #92400e); color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 5px; box-shadow: 0 4px 12px rgba(212,175,55,0.3); }
-        .ref-box { background: rgba(15, 23, 42, 0.9); padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px dashed #d4af37; text-align: center; display: none; }
+        .ref-box { background: rgba(15, 23, 42, 0.92); padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px dashed #d4af37; text-align: center; display: none; }
         .ref-box p { font-size: 12px; color: #d4af37; margin: 0 0 8px 0; font-weight: bold; }
         .ref-input { width: 100%; padding: 8px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 6px; font-size: 11px; text-align: center; box-sizing: border-box; margin-bottom: 8px; }
         .btn-copy { width: 100%; padding: 8px; background: #334155; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
@@ -59,7 +62,7 @@
         <h2>🏛️ صرافی اهورا DEX</h2>
         <div class="subtitle">میراث دیجیتال ایران باستان • توکن AHURA</div>
         
-        <button class="btn" id="connectBtn" onclick="connectWallet()">🛡️ اتصال به Trust Wallet</button>
+        <button class="btn" id="connectBtn" onclick="connectWallet()">🛡️ اتصال به کیف پول (جهانی)</button>
 
         <div class="swap-box">
             <label>پرداخت می‌کنید:</label>
@@ -86,33 +89,50 @@
         let userAddress = "";
 
         async function connectWallet() {
-            const provider = window.ethereum || window.trustwallet;
-            if (provider) {
-                try {
-                    const accounts = await provider.request({ method: 'eth_requestAccounts' });
-                    if (accounts.length > 0) {
-                        userAddress = accounts[0];
-                        const btn = document.getElementById('connectBtn');
-                        btn.style.backgroundColor = '#065f46';
-                        btn.style.borderColor = '#10b981';
-                        btn.innerText = 'متصل: ' + userAddress.substring(0, 6) + '...' + userAddress.substring(38);
-                        
-                        const currentUrl = window.location.origin + window.location.pathname;
-                        document.getElementById('refLink').value = currentUrl + '?ref=' + userAddress;
-                        document.getElementById('refSection').style.display = 'block';
-                    }
-                } catch (error) {
-                    console.error(error);
-                    alert('خطا در اتصال به کیف پول.');
-                }
-            } else {
-                alert('لطفاً حتماً این صفحه را داخل مرورگر خودِ Trust Wallet باز کنید.');
+            // پشتیبانی از تراست ولت، متامسک و سایر مرورگرها به صورت همزمان
+            let provider = window.ethereum || window.trustwallet;
+
+            if (!provider) {
+                // اگر کاربر در مرورگر عادی بود (مثل کروم معمولی)، از طریق متامسک اینجکت یا وب‌پروایدر تلاش می‌کنیم
+                alert('لطفاً کیف پول (مثل Trust Wallet یا MetaMask) روی مرورگر شما فعال باشد یا صفحه را درون اپلیکیشن کیف پول باز کنید.');
+                return;
             }
+
+            try {
+                const accounts = await provider.request({ method: 'eth_requestAccounts' });
+                if (accounts && accounts.length > 0) {
+                    setConnectedAccount(accounts[0]);
+                }
+            } catch (error) {
+                console.error(error);
+                // تلاش دوم برای مرورگرهای موبایلی خاص
+                try {
+                    if (window.ethereum) {
+                        const accounts = await window.ethereum.enable();
+                        if (accounts && accounts.length > 0) {
+                            setConnectedAccount(accounts[0]);
+                            return;
+                        }
+                    }
+                } catch(e) {}
+                alert('خطا در برقراری ارتباط با کیف پول.');
+            }
+        }
+
+        function setConnectedAccount(account) {
+            userAddress = account;
+            const btn = document.getElementById('connectBtn');
+            btn.style.backgroundColor = '#065f46';
+            btn.style.borderColor = '#10b981';
+            btn.innerText = 'متصل: ' + userAddress.substring(0, 6) + '...' + userAddress.substring(38);
+            
+            const currentUrl = window.location.origin + window.location.pathname;
+            document.getElementById('refLink').value = currentUrl + '?ref=' + userAddress;
+            document.getElementById('refSection').style.display = 'block';
         }
 
         function calculate() {
             let val = document.getElementById('amount').value;
-            // هر 1 اتریوم فرضاً معادل 10,000 توکن اهورا
             let res = val ? (val * 10000).toLocaleString() : '0.0';
             document.getElementById('output').innerText = res;
         }
