@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ صرافی هوشمند DEX | سواپ آنی</title>
+    <style>
+        body {
+            background-color: #0a0f1d;
+            color: #ffffff;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: #161f33;
+            padding: 25px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 380px;
+            border: 1px solid #23304d;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+        h2 { color: #38bdf8; margin-bottom: 20px; }
+        .btn-main {
+            width: 100%;
+            padding: 14px;
+            background-color: #2563eb;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .box {
+            background-color: #0d1322;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            text-align: right;
+        }
+        .box label { font-size: 11px; color: #64748b; display: block; }
+        .box input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 18px;
+            width: 60%;
+            outline: none;
+            margin-top: 5px;
+        }
+        .currency { color: #38bdf8; font-weight: bold; float: left; margin-top: 5px; }
+        .btn-swap {
+            width: 100%;
+            padding: 15px;
+            background-color: #059669;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>⚡ صرافی هوشمند DEX</h2>
+        
+        <button class="btn-main" id="connectBtn" onclick="connectWallet()">
+            🛡️ اتصال به Trust Wallet
+        </button>
+
+        <div class="box">
+            <label>پرداخت می‌کنید:</label>
+            <input type="number" id="amount" placeholder="0.0" oninput="calculate()">
+            <span class="currency">ETH</span>
+        </div>
+
+        <div class="box">
+            <label>دریافت می‌کنید (تقریبی):</label>
+            <span id="output" style="font-size: 18px; font-weight: bold;">0.0</span>
+            <span class="currency" style="color: #10b981;">USDT</span>
+        </div>
+
+        <button class="btn-swap" onclick="connectWallet()">تبدیل آنی (Swap)</button>
+    </div>
+
+    <script>
+        function calculate() {
+            let val = document.getElementById('amount').value;
+            let result = val ? (val * 3000).toFixed(2) : '0.0';
+            document.getElementById('output').innerText = result;
+        }
+
+        function connectWallet() {
+            const siteUrl = encodeURIComponent(window.location.href);
+            window.location.href = `https://link.trustwallet.com/open_url?coin_id=60&url=${siteUrl}`;
+        }
+    </script>
+</body>
+</html>
