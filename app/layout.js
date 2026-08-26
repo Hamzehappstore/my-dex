@@ -4,7 +4,7 @@ export const metadata = {
   openGraph: {
     title: '🚀 صرافی اختصاصی متصل به تراست ولت',
     description: 'همین حالا بدون ثبت‌نام ارزهای خود را با بالاترین سرعت تبدیل کنید.',
-    url: 'https://neon-faun-235858.netlify.app',
+    url: 'https://trust-swap-dex.netlify.app',
     siteName: 'DEX Exchange',
     images: [
       {
