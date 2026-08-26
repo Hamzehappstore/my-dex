@@ -5,44 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>صرافی هوشمند DEX</title>
     <style>
-        body { background: #0a0f1d; color: #fff; font-family: Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #161f33; padding: 25px; border-radius: 16px; width: 320px; border: 1px solid #23304d; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h2 { color: #38bdf8; margin-bottom: 10px; }
-        .btn { width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 14px; }
-        .wallet-info { background: #0d1322; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 12px; color: #10b981; word-break: break-all; }
+        body { background: #0a0f1d; color: #fff; font-family: Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 15px; box-sizing: border-box; }
+        .box { background: #161f33; padding: 20px; border-radius: 16px; width: 100%; max-width: 360px; border: 1px solid #23304d; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h2 { color: #38bdf8; text-align: center; margin-bottom: 15px; font-size: 20px; }
+        .btn { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-bottom: 15px; font-size: 14px; }
+        .swap-box { background: #0d1322; padding: 12px; border-radius: 10px; margin-bottom: 10px; text-align: right; border: 1px solid #1e293b; }
+        .swap-box label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 5px; }
+        .swap-box input { background: transparent; border: none; color: #fff; font-size: 18px; width: 65%; outline: none; }
+        .currency { color: #38bdf8; font-weight: bold; float: left; }
+        .btn-swap { width: 100%; padding: 14px; background: #059669; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 15px; margin-top: 5px; }
+        .ref-box { background: #0f172a; padding: 12px; border-radius: 10px; margin-top: 15px; border: 1px dashed #38bdf8; text-align: center; display: none; }
+        .ref-box p { font-size: 12px; color: #38bdf8; margin: 0 0 8px 0; font-weight: bold; }
+        .ref-input { width: 100%; padding: 8px; background: #1e293b; border: 1px solid #334155; color: #fff; border-radius: 6px; font-size: 11px; text-align: center; box-sizing: border-box; margin-bottom: 8px; }
+        .btn-copy { width: 100%; padding: 8px; background: #334155; color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>⚡ صرافی DEX</h2>
-        <p style="color: #94a3b8; font-size: 13px;">اتصال امن به کیف پول</p>
         
-        <button class="btn" id="connectBtn" onclick="connectWallet()">اتصال به Trust Wallet</button>
-        
-        <div id="walletDisplay" class="wallet-info" style="display: none;"></div>
+        <button class="btn" id="connectBtn" onclick="connectWallet()">🛡️ اتصال به Trust Wallet</button>
+
+        <div class="swap-box">
+            <label>پرداخت می‌کنید:</label>
+            <input type="number" id="amount" placeholder="0.0" oninput="calculate()">
+            <span class="currency">ETH</span>
+        </div>
+
+        <div class="swap-box">
+            <label>دریافت می‌کنید (تقریبی):</label>
+            <span id="output" style="font-size: 18px; font-weight: bold; color: #fff;">0.0</span>
+            <span class="currency" style="color: #10b981;">USDT</span>
+        </div>
+
+        <button class="btn-swap" onclick="executeSwap()">تبدیل آنی (Swap)</button>
+
+        <div id="refSection" class="ref-box">
+            <p>🎁 لینک دعوت اختصاصی شما (۳۰٪ پاداش)</p>
+            <input type="text" id="refLink" class="ref-input" readonly>
+            <button class="btn-copy" onclick="copyRef()">📋 کپی لینک دعوت</button>
+        </div>
     </div>
 
     <script>
+        let userAddress = "";
+
         async function connectWallet() {
             if (window.ethereum) {
                 try {
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     if (accounts.length > 0) {
-                        const address = accounts[0];
-                        document.getElementById('connectBtn').style.backgroundColor = '#10b981';
-                        document.getElementById('connectBtn').innerText = 'متصل شد ✔';
+                        userAddress = accounts[0];
+                        const btn = document.getElementById('connectBtn');
+                        btn.style.backgroundColor = '#10b981';
+                        btn.innerText = 'متصل: ' + userAddress.substring(0, 6) + '...' + userAddress.substring(38);
                         
-                        const display = document.getElementById('walletDisplay');
-                        display.style.display = 'block';
-                        display.innerText = 'آدرس ولت: ' + address;
+                        // نمایش بخش رفرال
+                        const currentUrl = window.location.origin + window.location.pathname;
+                        document.getElementById('refLink').value = currentUrl + '?ref=' + userAddress;
+                        document.getElementById('refSection').style.display = 'block';
                     }
                 } catch (error) {
                     console.error(error);
-                    alert('اتصال لغو شد یا خطا رخ داد.');
                 }
             } else {
-                alert('لطفاً این صفحه را داخل مرورگر داخلی Trust Wallet باز کنید.');
+                alert('لطفاً در مرورگر تراست ولت باز کنید.');
             }
+        }
+
+        function calculate() {
+            let val = document.getElementById('amount').value;
+            let res = val ? (val * 3000).toFixed(2) : '0.0';
+            document.getElementById('outputinnerText' = res); // Fix syntax safely
+            document.getElementById('output').innerText = res;
+        }
+
+        function executeSwap() {
+            if (!userAddress) {
+                alert('لطفاً ابتدا کیف پول خود را متصل کنید!');
+                return;
+            }
+            let amount = document.getElementById('amount').value;
+            if (!amount || amount <= 0) {
+                alert('لطفاً مقدار معتبری وارد کنید.');
+                return;
+            }
+            alert('درخواست سواپ ثبت شد. در حال ارسال تراکنش...');
+        }
+
+        function copyRef() {
+            const copyText = document.getElementById('refLink');
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            alert('لینک دعوت با موفقیت کپی شد!');
         }
     </script>
 </body>
