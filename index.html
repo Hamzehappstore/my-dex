@@ -6,15 +6,44 @@
     <title>صرافی هوشمند DEX</title>
     <style>
         body { background: #0a0f1d; color: #fff; font-family: Tahoma, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { background: #161f33; padding: 25px; border-radius: 16px; width: 320px; border: 1px solid #23304d; text-align: center; }
-        button { width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .box { background: #161f33; padding: 25px; border-radius: 16px; width: 320px; border: 1px solid #23304d; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        h2 { color: #38bdf8; margin-bottom: 10px; }
+        .btn { width: 100%; padding: 14px; background: #2563eb; color: #fff; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 14px; }
+        .wallet-info { background: #0d1322; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 12px; color: #10b981; word-break: break-all; }
     </style>
 </head>
 <body>
     <div class="box">
         <h2>⚡ صرافی DEX</h2>
-        <p style="color: #94a3b8; font-size: 14px;">اتصال امن به کیف پول</p>
-        <button onclick="location.href='https://link.trustwallet.com/open_url?coin_id=60&url=' + encodeURIComponent(window.location.href)">اتصال به Trust Wallet</button>
+        <p style="color: #94a3b8; font-size: 13px;">اتصال امن به کیف پول</p>
+        
+        <button class="btn" id="connectBtn" onclick="connectWallet()">اتصال به Trust Wallet</button>
+        
+        <div id="walletDisplay" class="wallet-info" style="display: none;"></div>
     </div>
+
+    <script>
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    if (accounts.length > 0) {
+                        const address = accounts[0];
+                        document.getElementById('connectBtn').style.backgroundColor = '#10b981';
+                        document.getElementById('connectBtn').innerText = 'متصل شد ✔';
+                        
+                        const display = document.getElementById('walletDisplay');
+                        display.style.display = 'block';
+                        display.innerText = 'آدرس ولت: ' + address;
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('اتصال لغو شد یا خطا رخ داد.');
+                }
+            } else {
+                alert('لطفاً این صفحه را داخل مرورگر داخلی Trust Wallet باز کنید.');
+            }
+        }
+    </script>
 </body>
 </html>
