@@ -7,9 +7,10 @@ export default function Home() {
   const [walletAddress, setWalletAddress] = useState('');
   const [refLink, setRefLink] = useState('');
   const [copied, setCopied] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // ذخیره کد معرف از URL
+    setIsClient(true);
     const queryParams = new URLSearchParams(window.location.search);
     const ref = queryParams.get('ref');
     if (ref) {
@@ -48,6 +49,8 @@ export default function Home() {
     const text = encodeURIComponent("⚡ کارمزد صفر و تبدیل آنی ارزها در تراست ولت! همین حالا امتحان کنید:");
     window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(refLink)}`, '_blank');
   };
+
+  if (!isClient) return null;
 
   return (
     <main style={{
@@ -128,7 +131,6 @@ export default function Home() {
           تبدیل آنی (Swap)
         </button>
 
-        {/* بخش ویروسی: سیستم کسب درآمد و رفرال خودکار */}
         {walletAddress && (
           <div style={{
             backgroundColor: '#0f172a',
