@@ -1,88 +1,107 @@
 'use client';
+
 import { useState } from 'react';
 
 export default function Home() {
-  const [account, setAccount] = useState('');
-  const [fromAmount, setFromAmount] = useState('');
-  const [toAmount, setToAmount] = useState('');
+  const [amount, setAmount] = useState('');
 
-  const MY_FEE_WALLET = "0x0a4389b55DdB437901244ce5e33BaE6E8bA2Ed77";
+  const connectWallet = () => {
+    const siteUrl = encodeURIComponent(window.location.href);
+    const trustWalletDeepLink = `https://link.trustwallet.com/open_url?coin_id=60&url=${siteUrl}`;
 
-  const connectWallet = async () => {
-    if (typeof window !== 'undefined' && window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        setAccount(accounts[0]);
-      } catch (err) {
-        alert("خطا در اتصال به کیف پول");
-      }
+    // بررسی اینکه آیا کاربر داخل مرورگر تراست ولت است یا خیر
+    if (typeof window !== 'undefined' && window.ethereum && window.ethereum.isTrust) {
+      window.ethereum.request({ method: 'eth_requestAccounts' })
+        .then(() => alert('کیف پول با موفقیت متصل شد'))
+        .catch((err) => console.error(err));
     } else {
-      alert("لطفاً از داخل مرورگر کیف پول (مثل متامسک یا تراست‌ولت) وارد شوید.");
+      // هدایت مستقیم به اپلیکیشن تراست ولت
+      window.location.href = trustWalletDeepLink;
     }
-  };
-
-  const handleAmountChange = (val) => {
-    setFromAmount(val);
-    setToAmount(val ? (parseFloat(val) * 3100).toFixed(2) : '');
-  };
-
-  const handleSwap = () => {
-    if (!account) {
-      alert("لطفاً ابتدا کیف پول خود را متصل کنید.");
-      return;
-    }
-    alert(`تراکنش ثبت شد!\nکارمزد معامله به ولت شما واریز شد:\n${MY_FEE_WALLET}`);
   };
 
   return (
-    <div style={{ backgroundColor: '#0f172a', color: '#fff', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: 'sans-serif', padding: '1rem' }}>
-      <div style={{ backgroundColor: '#1e293b', padding: '2rem', borderRadius: '1rem', width: '100%', maxWidth: '380px', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '1.5rem', color: '#38bdf8' }}>صرافی اختصاصی (DEX)</h2>
+    <main style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      backgroundColor: '#0f172a',
+      color: '#ffffff',
+      fontFamily: 'sans-serif',
+      padding: '20px'
+    }}>
+      <div style={{
+        backgroundColor: '#1e293b',
+        padding: '30px',
+        borderRadius: '16px',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.5)',
+        width: '100%',
+        maxWidth: '400px',
+        textAlign: 'center'
+      }}>
+        <h2 style={{ color: '#38bdf8', marginBottom: '24px' }}>صرافی اختصاصی (DEX)</h2>
         
-        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
-          <button 
-            onClick={connectWallet}
-            style={{ backgroundColor: account ? '#059669' : '#3b82f6', color: '#fff', border: 'none', padding: '0.75rem 1.25rem', borderRadius: '0.5rem', fontWeight: 'bold', cursor: 'pointer', width: '100%' }}
-          >
-            {account ? `متصل: ${account.slice(0, 6)}...${account.slice(-4)}` : 'اتصال کیف پول (Connect)'}
-          </button>
-        </div>
+        <button 
+          onClick={connectWallet}
+          style={{
+            width: '100%',
+            padding: '14px',
+            backgroundColor: '#3b82f6',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '10px',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            marginBottom: '20px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '10px'
+          }}>
+          🛡️ اتصال به Trust Wallet (پیش‌فرض)
+        </button>
 
-        <div style={{ backgroundColor: '#334155', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1rem' }}>
-          <label style={{ fontSize: '0.875rem', color: '#94a3b8' }}>پرداخت می‌کنید:</label>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', alignItems: 'center' }}>
+        <div style={{ backgroundColor: '#0f172a', padding: '15px', borderRadius: '10px', marginBottom: '15px', textAlign: 'right' }}>
+          <label style={{ fontSize: '12px', color: '#94a3b8' }}>پرداخت می‌کنید:</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
             <input 
               type="number" 
               placeholder="0.0" 
-              value={fromAmount}
-              onChange={(e) => handleAmountChange(e.target.value)}
-              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '1.25rem', width: '60%', outline: 'none' }}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '18px', width: '60%', outline: 'none' }}
             />
-            <span style={{ fontWeight: 'bold', color: '#f8fafc' }}>ETH</span>
+            <span style={{ fontWeight: 'bold' }}>ETH</span>
           </div>
         </div>
 
-        <div style={{ backgroundColor: '#334155', padding: '1rem', borderRadius: '0.5rem', marginBottom: '1.5rem' }}>
-          <label style={{ fontSize: '0.875rem', color: '#94a3b8' }}>دریافت می‌کنید (تقریبی):</label>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem', alignItems: 'center' }}>
-            <input 
-              type="text" 
-              readOnly 
-              value={toAmount}
-              placeholder="0.0" 
-              style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '1.25rem', width: '60%', outline: 'none' }}
-            />
-            <span style={{ fontWeight: 'bold', color: '#f8fafc' }}>USDT</span>
+        <div style={{ backgroundColor: '#0f172a', padding: '15px', borderRadius: '10px', marginBottom: '20px', textAlign: 'right' }}>
+          <label style={{ fontSize: '12px', color: '#94a3b8' }}>دریافت می‌کنید (تقریبی):</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
+            <span style={{ fontSize: '18px' }}>{amount ? (parseFloat(amount) * 3000).toFixed(2) : '0.0'}</span>
+            <span style={{ fontWeight: 'bold' }}>USDT</span>
           </div>
         </div>
 
         <button 
-          onClick={handleSwap}
-          style={{ width: '100%', padding: '1rem', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '0.5rem', fontSize: '1rem', fontWeight: 'bold', cursor: 'pointer' }}
-        >
-          {account ? 'تبدیل آنی (Swap)' : 'ابتدا کیف پول را متصل کنید'}
+          onClick={connectWallet}
+          style={{
+            width: '100%',
+            padding: '14px',
+            backgroundColor: '#10b981',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '10px',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}>
+          ابتدا کیف پول را متصل کنید
         </button>
       </div>
-    </div>
+    </main>
   );
 }
